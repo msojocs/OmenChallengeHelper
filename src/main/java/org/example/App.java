@@ -15,20 +15,22 @@ import java.util.*;
 public class App 
 {
     public static void main( String[] args ) throws Exception {
-        Scanner scanner = new Scanner(System.in);
+        // 游戏项目，抓包取得
+        String[] eventName = {
+                "PLAY:LEAGUE_OF_LEGENDS"
+        };
+        // 需要做任务的id eventName的下标
+        int eventId = 0;
+        // genTime参数为玩的时间，3为玩了3分钟
+        String[] time = genTime(3);
 
+        // 输入SESSION
+        Scanner scanner = new Scanner(System.in);
         System.out.print("请输入SESSION：");
         String sessionToken = scanner.next();
 
         // 生成数据
         String applicationId = "6589915c-6aa7-4f1b-9ef5-32fa2220c844";
-
-        String[] eventName = {
-                "PLAY:LEAGUE_OF_LEGENDS"
-        };
-        int eventId = 0;
-
-        String[] time = genTime(0);
         String start = time[0];
         String end = time[1];
 
