@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 从高到地低 OFF 、 FATAL 、 ERROR 、 WARN 、 INFO 、 DEBUG 、 TRACE 、 ALL -->
+<!-- 日志输出规则 根据当前ROOT 级别，日志输出时，级别高于root默认的级别时 会输出 -->
+<!-- 以下 每个配置的 filter 是过滤掉输出文件里面，会出现高级别文件，依然出现低级别的日志信息，通过filter 过滤只记录本级别的日志 -->
+
+
+<!-- 属性描述 scan：性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true scanPeriod:设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟。
+	debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。 -->
+<configuration scan="true" scanPeriod="60 seconds" debug="false">
+    <contextName>d1money-web-ys-ems</contextName>
+
+    <!-- ConsoleAppender 控制台输出日志 -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- 对日志进行格式化 -->
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger -%msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <!--<logger name="java.sql.PreparedStatement" level="DEBUG" />-->
+    <!--<logger name="java.sql.Connection" level="DEBUG" />-->
+    <!--<logger name="java.sql.Statement" level="DEBUG" />-->
+    <!--<logger name="com.ibatis" level="DEBUG" />-->
+    <logger name="org.apdplat.word" level="OFF" />
+    <logger name="org.apdplat.word.util.WordConfTools" level="OFF" />
+    <!--<logger name="com.ibatis.common.jdbc.SimpleDataSource" level="DEBUG" />-->
+    <!--<logger name="com.ibatis.common.jdbc.ScriptRunner" level="DEBUG" />-->
+    <!--<logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate"-->
+    <!--        value="DEBUG" />-->
+    <logger name="com.apache.ibatis" level="TRACE" />
+    <logger name="org.apache.hc.client5" level="INFO" />
+
+
+
+    <!-- root级别 DEBUG -->
+    <root level="INFO">
+        <!-- 控制台输出 -->
+        <appender-ref ref="STDOUT" />
+    </root>
+</configuration>

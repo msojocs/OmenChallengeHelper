@@ -1,0 +1,62 @@
+{
+  "id": "6589915c-6aa7-4f1b-9ef5-32fa2220c844",
+  "jsonrpc": "2.0",
+  "result": [
+    {
+      "apiIntegratedGames": [],
+      "challengeInstanceId": "0961342a-6aaf-4703-93bd-b328bb313aa8",
+      "challengeStructureId": "93b2a979-b99f-4603-8cf9-75facf1e94f9",
+      "completedAt": null,
+      "createdAt": "2021-05-26T02:43:32Z",
+      "displayLongDescription": "Play 45 Minutes of League of Legends to complete this challenge.\n\nUpon accepting the challenge, the player will have 24 hours to play 45 minutes of League of Legends.\n\nOMEN Rewards isn't endorsed by Riot Games and doesn't reflect the views or opinions of Riot Games or anyone officially involved in producing or managing Riot Games properties. Riot Games, and all associated properties are trademarks or registered trademarks of Riot Games, Inc.",
+      "displayName": "玩 45 分钟《英雄联盟》游戏，完成此项挑",
+      "displayShortDescription": "Play 45 Minutes of League of Legends",
+      "expiresAt": "2021-05-27T02:43:32Z",
+      "isEligible": true,
+      "maxRankRequired": null,
+      "minRankRequired": null,
+      "needsReviewReason": null,
+      "prize": {
+        "campaignId": "97331cfd-894f-4e46-b5bb-b9cbd975e68b",
+        "category": "sweepstake",
+        "challengeInstanceId": null,
+        "displayDescription": "This prize is sponsored by HP. This promotion is in no way sponsored, endorsed or administered by, or associated with, Green Man Gaming Limited.\n\nThe Just Cause 3 XXL Edition packs the critically acclaimed Just Cause 3 game as well as a great selection of extra missions, explosive weapons and vehicles to expand your experience in Medici. This ultimate edition of the game will please newcomers who want to jump into all of Rico's missions with a boosted arsenal and exotic new vehicles. \n\nRandom winners will be selected on 5/29/2021\n\nJust Cause 3 XXL Ed. Game Key (\"Promotion\").\n\nSuccessfully complete the challenge for a chance to win a Just Cause 3 XXL Ed. Game Key!\n\nSweepstakes Rules\nNO PURCHASE NECESSARY TO ENTER TO WIN. Please read the description of the sweepstakes available in the Game (\"Initial Rules\") provided with the relevant sweepstakes and the following master official rules (\"Master Rules\" and, together with the Initial Rules, \" Rules\") before entering the Promotion. By entering the Promotion, you (\"Entrant\") agree to be bound by the Rules and represent that you all eligibility requirements for the Promotion. Must be eighteen (18) years or older. \"Promotion Period\" begins on 5/26/21 08:00:00 AM and ends on 5/28/21 8:00:00 AM (\"Deadline\").  Winners will be selected randomly from among all eligible entries received during Promotion Period. Entries must be submitted by the Deadline to be eligible to win. Only eligible Entrants will be eligible to win (one) 1 Just Cause 3 XXL Ed. Game Code (\"Prize\") per household. Winner must follow instructions and respond with information or documents requested prior to 5/31/21 11:59 pm. Sponsor reserves, in its sole discretion, the right to extend Promotion Period for any reason without notice.\n\n©2019 Green Man Gaming Limited. US Patent Pending. All rights Reserved. Trademarks are property of their respective owners.\n\n",
+        "displayMsrp": null,
+        "displayName": "Just Cause 3 XXL Ed. Game Key ",
+        "displayRedemptionProcedure": null,
+        "drawing": null,
+        "fulfilledAt": null,
+        "fulfillmentMethod": "naught",
+        "imageUrl": "https://res.cloudinary.com/dojcawtqg/image/upload/v1620667601/prod/behefcwyd8ic3tpbcug5.png",
+        "logoUrl": "https://res.cloudinary.com/dojcawtqg/image/upload/v1620667583/prod/efr4rernimuqwe2bilbn.png",
+        "pictureUrls": [],
+        "priority": 0,
+        "prizeId": null,
+        "prizeProviderId": "ff87cfc3-7c98-4abd-b2a3-4b8af5ca721b",
+        "prizeType": {
+          "name": "Sweepstake Ticket",
+          "prizeTypeId": "501c5bd2-223f-430a-ba98-0594105d4791"
+        },
+        "redeemedAt": null,
+        "shouldDisplayMsrp": false,
+        "state": null,
+        "token": null,
+        "wonAt": null
+      },
+      "progressPercentage": 5,
+      "relevantEvents": [
+        "PLAY:LEAGUE_OF_LEGENDS"
+      ],
+      "result": null,
+      "settledAt": null,
+      "showTimeRemaining": true,
+      "startedAt": "2021-05-26T02:43:32Z",
+      "state": "running",
+      "timeLimit": 86400,
+      "winCondition": {
+        "displayName": "Play 45 Minutes of League of Legends",
+        "winConditionId": "d6aaaa7c-aaf2-4eb3-bfe0-9ed6d7032fa9"
+      }
+    }
+  ]
+}
