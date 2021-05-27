@@ -18,7 +18,7 @@ public class AllChallengeListBody extends BasicBody{
         body.put("method", method);
         params.put("onlyShowEligibleChallenges", true);
         params.put("page", 1);
-        params.put("pageSize", 10);
+        params.put("pageSize", 100);
 
         return gen();
     }

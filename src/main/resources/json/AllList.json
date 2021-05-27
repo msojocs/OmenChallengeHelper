@@ -1,0 +1,108 @@
+{
+  "id": "6589915c-6aa7-4f1b-9ef5-32fa2220c844",
+  "jsonrpc": "2.0",
+  "result": {
+    "collection": [
+      {
+        "apiIntegratedGames": [],
+        "challengeStructureId": "01b742ef-a124-4c59-a9ee-813a5ea8cdb1",
+        "displayLongDescription": "Player must play 45 minutes of Overwatch to complete the challenge. \n\nUpon accepting this challenge, you will have 24 hours to play 45 minutes of Overwatch.\n\nOMEN Rewards isn't endorsed by Blizzard Entertainment and doesn't reflect the views or opinions of Blizzard Entertainment or anyone officially involved in producing or managing Overwatch. Overwatch and Blizzard Entertainment are trademarks or registered trademarks of Blizzard Entertainment, Inc. in the U.S. and/or other countries. Overwatch © Blizzard Entertainment.",
+        "displayName": "玩 45 分钟《守望先锋》游戏，完成此项挑战  ",
+        "displayShortDescription": "Play Overwatch for 45 Minutes",
+        "ineligibilityReason": null,
+        "isEligible": true,
+        "maxRankRequired": null,
+        "minRankRequired": null,
+        "prize": {
+          "campaignId": "073602ca-0c63-43fb-9273-341f472d67db",
+          "category": "sweepstake",
+          "challengeInstanceId": null,
+          "displayDescription": "This prize is sponsored by Fanatical. \n\nPlay at being a Hired Gun\n\nThe money’s good, the dog’s loyal, and the recruitment process is simple. Play challenges with OMEN Rewards for your chance to win a free copy of Necromunda: Hired Gun!\n\nRandom winner will be selected on 5/30/2021\n\nNecromunda: Hired Gun Game Key(\"Promotion\").\n\nSuccessfully complete the challenge for a chance to win a Necromunda: Hired Gun Game Key!\n\nSweepstakes Rules\nNO PURCHASE NECESSARY TO ENTER TO WIN. Please read the description of the sweepstakes available in the Game (\"Initial Rules\") provided with the relevant sweepstakes and the following master official rules (\"Master Rules\" and, together with the Initial Rules, \" Rules\") before entering the Promotion. By entering the Promotion, you (\"Entrant\") agree to be bound by the Rules and represent that you all eligibility requirements for the Promotion. Must be eighteen (18) years or older. \"Promotion Period\" begins on 5/27/21 08:00:00 AM and ends on 5/29/21 8:00:00 AM (\"Deadline\").  Winner will be selected randomly from among all eligible entries received during Promotion Period. Entries must be submitted by the Deadline to be eligible to win. Only eligible Entrants will be eligible to win (one) 1 Necromunda: Hired Gun Game Key (\"Prize\") per household. Winner must follow instructions and respond with information or documents requested prior to 5/31/21 11:59 pm. Sponsor reserves, in its sole discretion, the right to extend Promotion Period for any reason without notice.\n\n© 2021 Focus Multimedia Ltd. All rights reserved. All trademarks are property of their respective owners. ",
+          "displayMsrp": null,
+          "displayName": "Necromunda: Hired Gun Game Key",
+          "displayRedemptionProcedure": null,
+          "drawing": null,
+          "fulfilledAt": null,
+          "fulfillmentMethod": "naught",
+          "imageUrl": "https://res.cloudinary.com/dojcawtqg/image/upload/v1621280905/prod/esntnvg75nrzsuglckry.png",
+          "logoUrl": "https://res.cloudinary.com/dojcawtqg/image/upload/v1621280900/prod/khdsanf3imjqumumgfb3.png",
+          "pictureUrls": [],
+          "priority": 0,
+          "prizeId": null,
+          "prizeProviderId": "18149fbf-ea2c-4558-834d-4ee6e402a2a8",
+          "prizeType": {
+            "name": "Sweepstake Ticket",
+            "prizeTypeId": "501c5bd2-223f-430a-ba98-0594105d4791"
+          },
+          "redeemedAt": null,
+          "shouldDisplayMsrp": false,
+          "state": null,
+          "token": null,
+          "wonAt": null
+        },
+        "relevantEvents": [
+          "PLAY:OVERWATCH"
+        ],
+        "showTimeRemaining": true,
+        "timeLimit": 86400,
+        "winCondition": {
+          "displayName": "Play Overwatch for 45 Minutes",
+          "winConditionId": "8007b8bb-9a91-412c-8477-146e9587f870"
+        }
+      },
+      {
+        "apiIntegratedGames": [],
+        "challengeStructureId": "6e85b843-f124-45ea-8390-e34d48fe9c3d",
+        "displayLongDescription": "Play QQ Speed\n\nUpon accepting the challenge, player will have 24 hours to play QQ Speed.\n\nOMEN Rewards isn't endorsed byTiMi Studios and doesn't reflect the views or opinions of TiMi Studios or anyone officially involved in producing or managing QQ Speed. © 1998 – 2020 TENCENT. ALL RIGHTS RESERVED.",
+        "displayName": " 玩《QQ 飞车》 ",
+        "displayShortDescription": "Play QQ Speed",
+        "ineligibilityReason": null,
+        "isEligible": true,
+        "maxRankRequired": null,
+        "minRankRequired": null,
+        "prize": {
+          "campaignId": "155686db-fb3f-46d6-8ee6-9a6ef145821a",
+          "category": "general",
+          "challengeInstanceId": null,
+          "displayDescription": "This offer is only valid for German Slippers customers.\n\n*$8 Off Wool Slippers and Leather Sandals valid for German Slippers customers. Limit one promotion for first time customer. Cannot be combined with other offers or promotions. Only Wool Slippers and Leather Sandals. Exclusions apply.\n\nAbout German Slippers\n\nGerman-Slippers is the gate to the world of fine Austrian and German clogs, mules, home shoes, house and bedroom slippers for people of all ages and from all walks of life. We offer 100% free shipping worldwide on all our house shoes!\n",
+          "displayMsrp": 0,
+          "displayName": "$8 Off Wool Slippers & More*!",
+          "displayRedemptionProcedure": null,
+          "drawing": null,
+          "fulfilledAt": null,
+          "fulfillmentMethod": "email",
+          "imageUrl": "https://res.cloudinary.com/dojcawtqg/image/upload/v1620689765/prod/xqgfgfmilccjydyrnq0q.png",
+          "logoUrl": "https://res.cloudinary.com/dojcawtqg/image/upload/v1620689759/prod/fcksg7me6uiiv9vh7lwh.png",
+          "pictureUrls": [
+            "https://res.cloudinary.com/dojcawtqg/image/upload/v1620689772/prod/h5qfrev9mwtovn9jkocc.png"
+          ],
+          "priority": 0,
+          "prizeId": null,
+          "prizeProviderId": "5ac7a596-41a0-4cf2-aa5e-f663cf3ad052",
+          "prizeType": {
+            "name": "Physical Good",
+            "prizeTypeId": "2b48416e-ca29-4111-9d05-0e8ccf338155"
+          },
+          "redeemedAt": null,
+          "shouldDisplayMsrp": false,
+          "state": null,
+          "token": null,
+          "wonAt": null
+        },
+        "relevantEvents": [
+          "PLAY:QQ_SPEED"
+        ],
+        "showTimeRemaining": true,
+        "timeLimit": 86400,
+        "winCondition": {
+          "displayName": "Play QQ Speed",
+          "winConditionId": "25c24e88-5b7a-4342-823c-d6c19b522f9a"
+        }
+      }
+    ],
+    "count": 2,
+    "currentPageNumber": 1,
+    "pageSize": 1000,
+    "totalPageCount": 1
+  }
+}
