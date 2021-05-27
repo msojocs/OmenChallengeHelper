@@ -96,7 +96,7 @@ public class HttpUtil {
         final RequestConfig config = unBuildConfig
                 .setConnectTimeout(Timeout.ofSeconds(5))
                 .setRedirectsEnabled(false)
-                .setProxy(new HttpHost("127.0.0.1", 8866))      // TODO:开发环境设置代理
+                // .setProxy(new HttpHost("127.0.0.1", 8866))      // TODO:开发环境设置代理
                 .setCircularRedirectsAllowed(true)
                 .build();
 
