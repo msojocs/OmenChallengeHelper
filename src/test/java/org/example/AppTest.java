@@ -2,6 +2,7 @@ package org.example;
 
 import static org.junit.Assert.assertTrue;
 
+import org.example.Omen.VsJSONProgressEvent;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
@@ -38,5 +39,15 @@ public class AppTest
         System.out.println(start);
         System.out.println(end);
 
+    }
+
+    @Test
+    public void signature() throws Exception {
+        System.out.println(new VsJSONProgressEvent(
+                "PLAY:LEAGUE_OF_LEGENDS",
+                "2021-05-27T04:10:07.769485Z",
+                "2021-05-27T04:10:10.430310Z",
+                1
+        ).GetSignature("6589915c-6aa7-4f1b-9ef5-32fa2220c844",""));
     }
 }

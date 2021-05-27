@@ -96,7 +96,7 @@ public class HttpUtil {
         final RequestConfig config = unBuildConfig
                 .setConnectTimeout(Timeout.ofSeconds(5))
                 .setRedirectsEnabled(false)
-                .setProxy(new HttpHost("127.0.0.1", 8866))      // TODO:开发环境设置代理
+                // .setProxy(new HttpHost("127.0.0.1", 8866))      // TODO:开发环境设置代理
                 .setCircularRedirectsAllowed(true)
                 .build();
 
@@ -287,7 +287,7 @@ public class HttpUtil {
         return getString(Objects.requireNonNull(doPost(url, null, headers, CHARSET)), CHARSET);
     }
 
-    public static String doStreamPost(String url, byte[] data, Map<String, String> headers) throws IOException {
+    public static HttpUtilEntity doStreamPost(String url, byte[] data, Map<String, String> headers) throws IOException {
         InputStreamEntity inputStreamEntity = genStreamEntity(data);
         HttpPost httpPost = new HttpPost(url);
         addHeader(httpPost, headers);
@@ -295,19 +295,10 @@ public class HttpUtil {
 
         CloseableHttpResponse response = null;
         try {
-            response = httpClient.execute(httpPost, defaultContext);
-            int statusCode = response.getCode();
-            if (statusCode != 200) {
-                httpPost.abort();
-                throw new RuntimeException("HttpClient,error status code :" + statusCode);
-            }
-            HttpEntity entity = response.getEntity();
-            String result = null;
-            if (entity != null) {
-                result = EntityUtils.toString(entity, "utf-8");
-            }
-            EntityUtils.consume(entity);
-            return result;
+            response = doPost1(url, httpPost, headers, CHARSET);
+            HttpUtilEntity httpUtilEntity = response2entity(response, CHARSET);
+            response.close();
+            return httpUtilEntity;
         } catch (ParseException e) {
             e.printStackTrace();
         } finally {
@@ -382,6 +373,19 @@ public class HttpUtil {
         HttpUtilEntity httpUtilEntity = response2entity(closeableHttpResponse, charset);
         closeableHttpResponse.close();
         return httpUtilEntity;
+    }
+
+    public static CloseableHttpResponse doPost1(
+            String url,
+            HttpPost httpPost,
+            Map<String, String> headers,
+            String charset
+    ) throws IOException {
+        if (StringUtils.isBlank(url)) {
+            return null;
+        }
+
+        return httpClient.execute(httpPost, defaultContext);
     }
 
     public static CloseableHttpResponse doPost(
