@@ -1,4 +1,4 @@
-package org.example.HTTP;
+package org.example.Utils.HTTP;
 
 import java.util.Map;
 

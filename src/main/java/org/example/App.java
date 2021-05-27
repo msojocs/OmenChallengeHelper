@@ -1,7 +1,9 @@
 package org.example;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.HTTP.HttpUtil;
+import org.example.Omen.VsJSONProgressEvent;
+import org.example.Utils.HTTP.HttpUtil;
+import org.example.Utils.JsonUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
@@ -22,7 +24,7 @@ public class App
         // 需要做任务的id eventName的下标
         int eventId = 0;
         // genTime参数为玩的时间，3为玩了3分钟
-        String[] time = genTime(3);
+        String[] time = genTime(6);
 
         // 输入SESSION
         Scanner scanner = new Scanner(System.in);

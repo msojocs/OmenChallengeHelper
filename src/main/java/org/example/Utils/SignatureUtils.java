@@ -1,4 +1,4 @@
-package org.example;
+package org.example.Utils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
