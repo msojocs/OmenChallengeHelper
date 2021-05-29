@@ -13,8 +13,7 @@ public class LoginTest {
     public void testLogin(){
         String email = System.getenv("EMAIL");
         String pass = System.getenv("PASS");
-        // TODO: client id获取
-        Login login = new Login(email, pass, "6589915c-6aa7-4f1b-9ef5-32fa2220c844", "");
+        Login login = new Login(email, pass, "6589915c-6aa7-4f1b-9ef5-32fa2220c844", "130d43f1-bb22-4a9c-ba48-d5743e84d113");
         login.doWeb();
     }
 }
