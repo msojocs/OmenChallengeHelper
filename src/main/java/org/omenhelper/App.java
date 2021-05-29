@@ -17,9 +17,9 @@ public class App
 
         Scanner scanner = new Scanner(System.in);
         // 输入SESSION
-        String sessionToken = System.getenv("SESSION");
-        // System.out.print("请输入SESSION：");
-        // String sessionToken = scanner.next();
+        // String sessionToken = System.getenv("SESSION");
+        System.out.print("请输入SESSION：");
+        String sessionToken = scanner.next();
 
         // 生成数据
         String applicationId = "6589915c-6aa7-4f1b-9ef5-32fa2220c844";

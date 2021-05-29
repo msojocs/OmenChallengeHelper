@@ -5,8 +5,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.example</groupId>
-  <artifactId>OmenChallengeCrack</artifactId>
-  <version>1.0</version>
+  <artifactId>OmenChallengeHelper</artifactId>
+  <version>1.0.1</version>
 
   <name>OmenChallengeCrack</name>
   <!-- FIXME change it to the project's website -->
