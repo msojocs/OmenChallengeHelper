@@ -99,10 +99,19 @@ public class HttpUtil2 {
      */
     public HttpUtil2(Map<String, Object> config){
         // 自定义配置
-        if(config.containsKey("redirection"))
-            unBuildConfig.setMaxRedirects((int)config.get("redirection"));
-        localContext.setRequestConfig(unBuildConfig.build());
+        updateConfig(config);
 
+    }
+
+    public void updateConfig(Map<String, Object> config){
+        // 自定义配置
+        if(config.containsKey("redirection")) {
+            int redirection = (int) config.get("redirection");
+            unBuildConfig.setMaxRedirects(redirection);
+            if(redirection==0)
+                unBuildConfig.setRedirectsEnabled(false);
+        }
+        localContext.setRequestConfig(unBuildConfig.build());
     }
 
     /**
@@ -316,6 +325,28 @@ public class HttpUtil2 {
         return null;
     }
 
+
+    public HttpUtilEntity doStreamPost(String url, byte[] data, Map<String, String> headers) throws IOException {
+        InputStreamEntity inputStreamEntity = genStreamEntity(data);
+        HttpPost httpPost = new HttpPost(url);
+        addHeader(httpPost, headers);
+        httpPost.setEntity(inputStreamEntity);
+
+        CloseableHttpResponse response = null;
+        try {
+            response = doPost1(url, httpPost, headers, CHARSET);
+            HttpUtilEntity httpUtilEntity = response2entity(response, CHARSET);
+            response.close();
+            return httpUtilEntity;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } finally {
+            if (response != null)
+                response.close();
+        }
+        return null;
+    }
+
     public String doFilePost(String url, byte[] data) throws IOException {
         MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
         multipartEntityBuilder.addBinaryBody("captcha", data, ContentType.DEFAULT_BINARY, URLEncoder.encode("captcha.jpg", "utf-8"));
@@ -383,6 +414,18 @@ public class HttpUtil2 {
         return httpUtilEntity;
     }
 
+    public CloseableHttpResponse doPost1(
+            String url,
+            HttpPost httpPost,
+            Map<String, String> headers,
+            String charset
+    ) throws IOException {
+        if (StringUtils.isBlank(url)) {
+            return null;
+        }
+
+        return httpClient.execute(httpPost, localContext);
+    }
     public static CloseableHttpResponse doPost(
             String url,
             Map<String, String> params,

@@ -2,6 +2,7 @@ package org.omenhelper.Utils.HTTP;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.HttpHostConnectException;
+import org.apache.hc.client5.http.RedirectException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -51,7 +52,7 @@ import java.util.*;
  */
 public class HttpUtil {
 
-    private static final CustomCookieStore httpCookieStore;
+    private static final BasicCookieStore httpCookieStore;
     private static final HttpClientContext defaultContext;
     private static final RequestConfig.Builder unBuildConfig;
     private static final CloseableHttpClient httpClient;
@@ -88,7 +89,7 @@ public class HttpUtil {
                 .build();
 
         // Cookie存储
-        httpCookieStore = new CustomCookieStore();
+        httpCookieStore = new BasicCookieStore();
 
         unBuildConfig = RequestConfig.custom();
 
@@ -96,7 +97,7 @@ public class HttpUtil {
         final RequestConfig config = unBuildConfig
                 .setConnectTimeout(Timeout.ofSeconds(5))
                 .setRedirectsEnabled(false)
-                // .setProxy(new HttpHost("127.0.0.1", 8866))      // TODO:开发环境设置代理
+                .setProxy(new HttpHost("127.0.0.1", 8866))      // TODO:开发环境设置代理
                 .setCircularRedirectsAllowed(true)
                 .build();
 
@@ -120,7 +121,7 @@ public class HttpUtil {
      * @return Map<String, String>
      */
     public static Map<String, String> getCookie() {
-        List<Cookie> cookiesCustom = httpCookieStore.getCookiesCustom();
+        List<Cookie> cookiesCustom = httpCookieStore.getCookies();
         Map<String, String> cookies = new HashMap<>();
         for (Cookie cookie : cookiesCustom) {
             cookies.put(cookie.getName(), cookie.getValue());
@@ -263,6 +264,10 @@ public class HttpUtil {
 
             return httpClient.execute(httpGet, context);
         } catch (Exception e) {
+            if(e.getCause() instanceof RedirectException) {
+                // 处理"达到最大重定向异常"
+                return (CloseableHttpResponse) context.getResponse();
+            }
             e.printStackTrace();
         }
         return null;

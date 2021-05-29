@@ -20,7 +20,7 @@ public class App
         String sessionToken;
         System.out.print("请输入SESSION：");
         sessionToken = System.getenv("SESSION");
-        sessionToken = scanner.nextLine();
+        // sessionToken = scanner.nextLine();
 
         // 生成数据
         String applicationId = "6589915c-6aa7-4f1b-9ef5-32fa2220c844";
