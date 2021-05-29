@@ -1,7 +1,7 @@
-package org.example.Omen;
+package org.omenhelper.Omen;
 
-import com.sun.org.apache.xml.internal.security.utils.Base64;
-import org.example.Utils.SignatureUtils;
+import org.apache.commons.codec.binary.Base64;
+import org.omenhelper.Utils.SignatureUtils;
 
 import java.nio.charset.StandardCharsets;
 
@@ -89,6 +89,6 @@ public class VsJSONProgressEvent {
         // System.out.println("array3 --- " + HexUtil.byte2HexStr(array3));
         // System.out.println("ret --- " + HexUtil.byte2HexStr(ret));
 
-        return Base64.encode(ret);
+        return Base64.encodeBase64String(ret);
     }
 }

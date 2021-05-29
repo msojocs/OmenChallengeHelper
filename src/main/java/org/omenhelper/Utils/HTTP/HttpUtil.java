@@ -1,9 +1,7 @@
-package org.example.Utils.HTTP;
+package org.omenhelper.Utils.HTTP;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hc.client5.http.HttpHostConnectException;
-import org.apache.hc.client5.http.RedirectException;
 import org.apache.hc.client5.http.classic.methods.HttpGet;
 import org.apache.hc.client5.http.classic.methods.HttpPost;
 import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
@@ -11,98 +9,109 @@ import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.cookie.BasicCookieStore;
 import org.apache.hc.client5.http.cookie.Cookie;
 import org.apache.hc.client5.http.entity.UrlEncodedFormEntity;
+import org.apache.hc.client5.http.impl.io.ManagedHttpClientConnectionFactory;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.Header;
 import org.apache.hc.client5.http.entity.mime.MultipartEntityBuilder;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
-import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManagerBuilder;
-import org.apache.hc.client5.http.protocol.HttpClientContext;
 import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.core5.http.*;
+import org.apache.hc.core5.http.config.CharCodingConfig;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.InputStreamEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.apache.hc.core5.ssl.TrustStrategy;
 import org.apache.hc.core5.util.Timeout;
 
 import javax.net.ssl.SSLContext;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 /**
- * 网络请求工具类
+ * 网络请求工具类[公共]
  *
  * @author jiyec
  */
-@Slf4j
-public class HttpUtil2 {
+public class HttpUtil {
 
-    private final BasicCookieStore httpCookieStore = new BasicCookieStore();
-
-    private final HttpClientContext localContext = HttpClientContext.create();
-    private final RequestConfig.Builder unBuildConfig;
+    private static final CustomCookieStore httpCookieStore;
+    private static final HttpClientContext defaultContext;
+    private static final RequestConfig.Builder unBuildConfig;
     private static final CloseableHttpClient httpClient;
-    private static final String CHARSET = "UTF-8";
+    public static final String CHARSET = "UTF-8";
 
-    // 采用静态代码块，初始化部分配置，再根据配置生成默认httpClient对象
+    // 采用静态代码块，初始化超时时间配置，再根据配置生成默认httpClient对象
     static {
 
         // SSL准备
-        SSLContext sslContext;
+        SSLContext sslContext = null;
         SSLConnectionSocketFactory sslCSF = null;
         try {
-            // 信任所有
-            sslContext = new SSLContextBuilder().loadTrustMaterial(null, (chain, authType) -> true).build();
+            sslContext = new SSLContextBuilder().loadTrustMaterial(null, new TrustStrategy() {
+                // 信任所有
+                public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+                    return true;
+                }
+            }).build();
             sslCSF = new SSLConnectionSocketFactory(sslContext);
         } catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e) {
             e.printStackTrace();
         }
 
+        ManagedHttpClientConnectionFactory managedHttpClientConnectionFactory = new ManagedHttpClientConnectionFactory(
+                null, CharCodingConfig.custom()
+                .setMalformedInputAction(CodingErrorAction.IGNORE)
+                .setUnmappableInputAction(CodingErrorAction.IGNORE)
+                .setCharset(StandardCharsets.UTF_8)
+                .build(), null, null);
         // 连接池管理
         PoolingHttpClientConnectionManager cm = PoolingHttpClientConnectionManagerBuilder.create()
                 .setSSLSocketFactory(sslCSF)
+                .setConnectionFactory(managedHttpClientConnectionFactory)
                 .build();
 
+        // Cookie存储
+        httpCookieStore = new CustomCookieStore();
+
+        unBuildConfig = RequestConfig.custom();
+
+        // 配置
+        final RequestConfig config = unBuildConfig
+                .setConnectTimeout(Timeout.ofSeconds(5))
+                .setRedirectsEnabled(false)
+                // .setProxy(new HttpHost("127.0.0.1", 8866))      // TODO:开发环境设置代理
+                .setCircularRedirectsAllowed(true)
+                .build();
+
+        // 动态配置
+        defaultContext = HttpClientContext.create();
+        defaultContext.setCookieStore(httpCookieStore);
+        defaultContext.setRequestConfig(config);
 
         // 创建客户端
         httpClient = HttpClients.custom()
+                .setDefaultCookieStore(httpCookieStore)
+                .setDefaultRequestConfig(config)
                 .setConnectionManager(cm)
                 .setUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36 Edg/90.0.818.51")
                 .build();
-    }
-    {
-        // 默认配置
-        unBuildConfig = RequestConfig.custom().setConnectTimeout(Timeout.ofSeconds(5))
-                .setProxy(new HttpHost("127.0.0.1", 8866))
-                .setCircularRedirectsAllowed(true);
-        localContext.setCookieStore(httpCookieStore);
-    }
-
-    public HttpUtil2(){
-        // 默认配置
-        localContext.setRequestConfig(unBuildConfig.build());
-    }
-
-    /**
-     * 自定义配置
-     * @param config
-     */
-    public HttpUtil2(Map<String, Object> config){
-        // 自定义配置
-        if(config.containsKey("redirection"))
-            unBuildConfig.setMaxRedirects((int)config.get("redirection"));
-        localContext.setRequestConfig(unBuildConfig.build());
-
     }
 
     /**
@@ -110,14 +119,15 @@ public class HttpUtil2 {
      *
      * @return Map<String, String>
      */
-    public Map<String, String> getCookie() {
-        List<Cookie> cookiesCustom = httpCookieStore.getCookies();
+    public static Map<String, String> getCookie() {
+        List<Cookie> cookiesCustom = httpCookieStore.getCookiesCustom();
         Map<String, String> cookies = new HashMap<>();
         for (Cookie cookie : cookiesCustom) {
             cookies.put(cookie.getName(), cookie.getValue());
         }
         return cookies;
     }
+
 
     /**
      *    _____/\\\\\\\\\\\\__/\\\\\\\\\\\\\\\__/\\\\\\\\\\\\\\\_
@@ -130,16 +140,18 @@ public class HttpUtil2 {
      *           _\//\\\\\\\\\\\\/__\/\\\\\\\\\\\\\\\_______\/\\\_______
      *            __\////////////____\///////////////________\///________
      *            FROM:http://patorjk.com/software/taag
-     *
+     */
+
+    /**
      * @param url 发送get请求的url
      * @return String 响应体
      */
-    public String doGet(String url) throws IOException, ParseException {
-        return getString(Objects.requireNonNull(doGet(url, null, null, CHARSET, localContext)), CHARSET);
+    public static String doGet(String url) throws IOException, ParseException {
+        return getString(Objects.requireNonNull(doGet(url, null, null, CHARSET, defaultContext)), CHARSET);
     }
 
-    public String doGet(String url, Map<String, String> params) throws IOException, ParseException {
-        return getString(Objects.requireNonNull(doGet(url, params, null, CHARSET, localContext)), CHARSET);
+    public static String doGet(String url, Map<String, String> params) throws IOException, ParseException {
+        return getString(Objects.requireNonNull(doGet(url, params, null, CHARSET, defaultContext)), CHARSET);
     }
 
     /**
@@ -150,8 +162,12 @@ public class HttpUtil2 {
      * @param charset 编码格式
      * @return 页面内容
      */
-    public String doGet(String url, Map<String, String> params, String charset) throws IOException, ParseException {
-        return getString(Objects.requireNonNull(doGet(url, params, null, charset, localContext)), charset);
+    public static String doGet(String url, Map<String, String> params, String charset) throws IOException, ParseException {
+        return getString(Objects.requireNonNull(doGet(url, params, null, charset, defaultContext)), charset);
+    }
+
+    public static String doGet(String url, String charset, Map<String, String> headers) throws IOException, ParseException {
+        return getString(Objects.requireNonNull(doGet(url, null, headers, charset, defaultContext)), charset);
     }
 
     /**
@@ -161,8 +177,8 @@ public class HttpUtil2 {
      * @param headers 自定义的请求头信息
      * @return 页面内容
      */
-    public String doGet2(String url, Map<String, String> headers) throws IOException, ParseException {
-        return getString(Objects.requireNonNull(doGet(url, null, headers, null, localContext)), CHARSET);
+    public static String doGet2(String url, Map<String, String> headers) throws IOException, ParseException {
+        return getString(Objects.requireNonNull(doGet(url, null, headers, null, defaultContext)), CHARSET);
     }
 
     /**
@@ -171,7 +187,7 @@ public class HttpUtil2 {
      * @param url 请求的url地址 ?之前的地址
      * @return 页面内容
      */
-    public HttpUtilEntity doGetEntity(String url) throws IOException, ParseException {
+    public static HttpUtilEntity doGetEntity(String url) throws IOException, ParseException {
         return doGetEntity(url, null, null, CHARSET);
     }
 
@@ -182,11 +198,11 @@ public class HttpUtil2 {
      * @param headers 自定义的请求头信息
      * @return 页面内容
      */
-    public HttpUtilEntity doGetEntity(String url, Map<String, String> headers) throws IOException, ParseException {
+    public static HttpUtilEntity doGetEntity(String url, Map<String, String> headers) throws IOException, ParseException {
         return doGetEntity(url, null, headers, CHARSET);
     }
 
-    public HttpUtilEntity doGetEntity(String url, Map<String, String> headers, String charset) throws IOException, ParseException {
+    public static HttpUtilEntity doGetEntity(String url, Map<String, String> headers, String charset) throws IOException, ParseException {
         return doGetEntity(url, null, headers, charset);
     }
 
@@ -198,43 +214,23 @@ public class HttpUtil2 {
      * @param headers 自定义请求头
      * @param charset 请求编码
      * @return HttpUtilEntity
-     *
      */
-    public HttpUtilEntity doGetEntity(String url, Map<String, String> params, Map<String, String> headers, String charset) throws IOException, ParseException {
-        CloseableHttpResponse closeableHttpResponse = doGet(url, params, headers, charset, localContext);
+    public static HttpUtilEntity doGetEntity(String url, Map<String, String> params, Map<String, String> headers, String charset) throws IOException, ParseException {
+        CloseableHttpResponse closeableHttpResponse = doGet(url, params, headers, charset, defaultContext);
 
         if(null == closeableHttpResponse)return null;
-
         HttpUtilEntity httpUtilEntity = response2entity(closeableHttpResponse, charset);
         closeableHttpResponse.close();
 
         return httpUtilEntity;
     }
-
-    public byte[] getContent(
-            String url,
-            Map<String, String> params,
-            Map<String, String> headers,
-            String charset) throws IOException {
-        CloseableHttpResponse httpResponse = doGet(url, params, headers, charset);
-        HttpEntity entity = httpResponse.getEntity();
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        byte[] chunk = new byte[1024];
-        InputStream inputStream = entity.getContent();
-        int len = -1;
-        while (-1 != (len=inputStream.read(chunk))){
-            outputStream.write(chunk, 0, chunk.length);
-        }
-        return outputStream.toByteArray();
-    }
-
-    public CloseableHttpResponse doGet(
+    public static CloseableHttpResponse doGet(
             String url,
             Map<String, String> params,
             Map<String, String> headers,
             String charset
     ) {
-        return doGet(url, params, headers, charset, localContext);
+        return doGet(url, params, headers, charset, defaultContext);
     }
     /**
      * HTTP Get 获取内容 [主方法]
@@ -267,10 +263,6 @@ public class HttpUtil2 {
 
             return httpClient.execute(httpGet, context);
         } catch (Exception e) {
-            if(e.getCause() instanceof RedirectException) {
-                // 处理"达到最大重定向异常"
-                return (CloseableHttpResponse) context.getResponse();
-            }
             e.printStackTrace();
         }
         return null;
@@ -288,41 +280,41 @@ public class HttpUtil2 {
      *            _\///___________________\/////_________\///////////___________\///________
      *            FROM:http://patorjk.com/software/taag
      */
-    public String doPost(String url, Map<String, String> params) throws IOException, ParseException {
-        return getString(Objects.requireNonNull(doPost(url, params, null, CHARSET, localContext)), CHARSET);
+    public static String doPost(String url, Map<String, String> params) throws IOException, ParseException {
+        return getString(Objects.requireNonNull(doPost(url, params, null, CHARSET)), CHARSET);
+    }
+    public static String doPost2(String url, Map<String, String> headers) throws IOException, ParseException {
+        return getString(Objects.requireNonNull(doPost(url, null, headers, CHARSET)), CHARSET);
     }
 
-    public String doStreamPost(String url, byte[] data) throws IOException {
+    public static HttpUtilEntity doStreamPost(String url, byte[] data, Map<String, String> headers) throws IOException {
         InputStreamEntity inputStreamEntity = genStreamEntity(data);
         HttpPost httpPost = new HttpPost(url);
+        addHeader(httpPost, headers);
         httpPost.setEntity(inputStreamEntity);
 
-        try (CloseableHttpResponse response = httpClient.execute(httpPost, localContext)) {
-            int statusCode = response.getCode();
-            if (statusCode != 200) {
-                httpPost.abort();
-                throw new RuntimeException("HttpClient,error status code :" + statusCode);
-            }
-            HttpEntity entity = response.getEntity();
-            String result = null;
-            if (entity != null) {
-                result = EntityUtils.toString(entity, "utf-8");
-            }
-            EntityUtils.consume(entity);
-            return result;
+        CloseableHttpResponse response = null;
+        try {
+            response = doPost1(url, httpPost, headers, CHARSET);
+            HttpUtilEntity httpUtilEntity = response2entity(response, CHARSET);
+            response.close();
+            return httpUtilEntity;
         } catch (ParseException e) {
             e.printStackTrace();
+        } finally {
+            if (response != null)
+                response.close();
         }
         return null;
     }
 
-    public String doFilePost(String url, byte[] data) throws IOException {
+    public static String doFilePost(String url, byte[] data) throws IOException {
         MultipartEntityBuilder multipartEntityBuilder = MultipartEntityBuilder.create();
         multipartEntityBuilder.addBinaryBody("captcha", data, ContentType.DEFAULT_BINARY, URLEncoder.encode("captcha.jpg", "utf-8"));
         HttpPost httpPost = new HttpPost(url);
         httpPost.setEntity(multipartEntityBuilder.build());
 
-        try (CloseableHttpResponse response = httpClient.execute(httpPost, localContext)) {
+        try (CloseableHttpResponse response = httpClient.execute(httpPost, defaultContext)) {
             int statusCode = response.getCode();
             if (statusCode != 200) {
                 httpPost.abort();
@@ -354,42 +346,54 @@ public class HttpUtil2 {
      * @return 页面内容
      * @throws IOException IO异常
      */
-    public String doPost(String url, Map<String, String> params, String charset)
+    public static String doPost(String url, Map<String, String> params, String charset)
             throws IOException, ParseException {
-        return getString(Objects.requireNonNull(doPost(url, params, null, charset, localContext)), charset);
+        return getString(Objects.requireNonNull(doPost(url, params, null, charset)), charset);
     }
-    public String doPost(String url, Map<String, String> params, Map<String, String> headers, String charset)
+    public static String doPost(String url, Map<String, String> params, Map<String, String> header)
             throws IOException, ParseException {
-        return getString(Objects.requireNonNull(doPost(url, params, headers, charset, localContext)), charset);
+        return getString(Objects.requireNonNull(doPost(url, params, header, CHARSET)), CHARSET);
     }
 
-    public HttpUtilEntity doPostEntity(String url, Map<String, String> params) throws IOException, ParseException {
+    public static HttpUtilEntity doPostEntity(String url, Map<String, String> params) throws IOException, ParseException {
         return doPostEntity(url, params, null, "UTF-8");
     }
 
-    public HttpUtilEntity doPostEntity(String url, Map<String, String> params, Map<String, String> headers) throws IOException, ParseException {
+    public static HttpUtilEntity doPostEntity(String url, Map<String, String> params, Map<String, String> headers) throws IOException, ParseException {
         return doPostEntity(url, params, headers, "UTF-8");
     }
 
-    public HttpUtilEntity doPostEntity(String url, Map<String, String> params, String charset) throws IOException, ParseException {
+    public static HttpUtilEntity doPostEntity(String url, Map<String, String> params, String charset) throws IOException, ParseException {
         return doPostEntity(url, params, null, charset);
     }
 
-    public HttpUtilEntity doPostEntity(String url, Map<String, String> params, Map<String, String> headers, String charset) throws IOException, ParseException {
-        CloseableHttpResponse closeableHttpResponse = doPost(url, params, headers, charset, localContext);
+    public static HttpUtilEntity doPostEntity(String url, Map<String, String> params, Map<String, String> headers, String charset) throws IOException, ParseException {
+        CloseableHttpResponse closeableHttpResponse = doPost(url, params, headers, charset);
         if(null == closeableHttpResponse)return null;
         HttpUtilEntity httpUtilEntity = response2entity(closeableHttpResponse, charset);
         closeableHttpResponse.close();
         return httpUtilEntity;
     }
 
+    public static CloseableHttpResponse doPost1(
+            String url,
+            HttpPost httpPost,
+            Map<String, String> headers,
+            String charset
+    ) throws IOException {
+        if (StringUtils.isBlank(url)) {
+            return null;
+        }
+
+        return httpClient.execute(httpPost, defaultContext);
+    }
+
     public static CloseableHttpResponse doPost(
             String url,
             Map<String, String> params,
             Map<String, String> headers,
-            String charset,
-            HttpClientContext context
-    ){
+            String charset
+    ) throws IOException {
         if (StringUtils.isBlank(url)) {
             return null;
         }
@@ -404,16 +408,7 @@ public class HttpUtil2 {
             httpPost.setEntity(urlEncodedFormEntity);
         }
 
-        try {
-            return httpClient.execute(httpPost, context);
-        } catch (IOException e) {
-            if(e.getCause() instanceof RedirectException) {
-                // 处理"达到最大重定向异常"
-                return (CloseableHttpResponse) context.getResponse();
-            }
-            e.printStackTrace();
-        }
-        return null;
+        return httpClient.execute(httpPost, defaultContext);
     }
 
     /***
@@ -428,7 +423,7 @@ public class HttpUtil2 {
      *            _\///________\///__\///________\///__\///_____\/////__\////////////_____\///////////////__\///////////////__
      *
      */
-    private HttpUtilEntity response2entity(CloseableHttpResponse closeableHttpResponse, String charset) throws IOException, ParseException {
+    private static HttpUtilEntity response2entity(CloseableHttpResponse closeableHttpResponse, String charset) throws IOException, ParseException {
 
         // 处理头信息
         Header[] allHeaders = closeableHttpResponse.getHeaders();
@@ -455,10 +450,10 @@ public class HttpUtil2 {
         return new InputStreamEntity(new ByteArrayInputStream(data), ContentType.MULTIPART_FORM_DATA);
     }
 
-    private static UrlEncodedFormEntity genFormEntity(Map<String, String> params, String charset) {
+    private static UrlEncodedFormEntity genFormEntity(Map<String, String> params, String charset) throws UnsupportedEncodingException {
         if (null == params || params.isEmpty()) return null;
 
-        List<NameValuePair> pairs;
+        List<NameValuePair> pairs = null;
 
         pairs = new ArrayList<>(params.size());
         for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -476,7 +471,6 @@ public class HttpUtil2 {
     }
 
     private static String getString(CloseableHttpResponse response, String charset) throws IOException, ParseException {
-
         HttpEntity entity = response.getEntity();
 
         String result = null;
@@ -488,5 +482,26 @@ public class HttpUtil2 {
         return result;
     }
 
+    public static HttpClientContext genConfig(Map<String, Object> customConfig){
+        Object timeout = customConfig.get("timeout");
+        Object maxRedirect = customConfig.get("maxRedirect");
+
+        // 配置
+        final RequestConfig config = RequestConfig.custom()
+                .setConnectTimeout(Timeout.ofSeconds(timeout!=null?(int)timeout:5))
+                .setMaxRedirects(maxRedirect!=null?(int)maxRedirect:0)
+                .setRedirectsEnabled(false)
+                // .setProxy(new HttpHost("127.0.0.1", 8866))      // TODO:开发环境设置代理
+                .setCircularRedirectsAllowed(true)
+                .build();
+
+        BasicCookieStore cookieStore = new BasicCookieStore();
+        // 动态配置
+        HttpClientContext context = HttpClientContext.create();
+        context.setCookieStore(cookieStore);
+        context.setRequestConfig(config);
+
+        return context;
+    }
 }
 

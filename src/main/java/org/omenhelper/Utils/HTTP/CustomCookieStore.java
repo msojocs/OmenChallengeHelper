@@ -1,4 +1,4 @@
-package org.example.Utils.HTTP;
+package org.omenhelper.Utils.HTTP;
 
 
 import org.apache.hc.client5.http.cookie.Cookie;

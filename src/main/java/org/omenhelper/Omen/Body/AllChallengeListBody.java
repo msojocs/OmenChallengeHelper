@@ -1,4 +1,4 @@
-package org.example.Omen.Body;
+package org.omenhelper.Omen.Body;
 
 import java.util.Map;
 

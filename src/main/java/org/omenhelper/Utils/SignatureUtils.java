@@ -1,4 +1,4 @@
-package org.example.Utils;
+package org.omenhelper.Utils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;

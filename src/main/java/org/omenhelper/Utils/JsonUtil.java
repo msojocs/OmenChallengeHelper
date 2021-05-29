@@ -1,4 +1,4 @@
-package org.example.Utils;
+package org.omenhelper.Utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;

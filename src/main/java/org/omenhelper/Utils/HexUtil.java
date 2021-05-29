@@ -1,4 +1,4 @@
-package org.example.Utils;
+package org.omenhelper.Utils;
 
 public class HexUtil {
 

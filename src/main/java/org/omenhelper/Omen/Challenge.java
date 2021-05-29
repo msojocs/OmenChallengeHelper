@@ -1,14 +1,13 @@
-package org.example.Omen;
+package org.omenhelper.Omen;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.App;
-import org.example.Omen.Body.AllChallengeListBody;
-import org.example.Omen.Body.ChallengePostBody;
-import org.example.Omen.Body.CurrentChallengeListBody;
-import org.example.Omen.Body.JoinChallengeBody;
-import org.example.Utils.HTTP.HttpUtil;
-import org.example.Utils.HTTP.HttpUtilEntity;
-import org.example.Utils.JsonUtil;
+import org.omenhelper.Omen.Body.AllChallengeListBody;
+import org.omenhelper.Omen.Body.ChallengePostBody;
+import org.omenhelper.Omen.Body.CurrentChallengeListBody;
+import org.omenhelper.Omen.Body.JoinChallengeBody;
+import org.omenhelper.Utils.HTTP.HttpUtil;
+import org.omenhelper.Utils.HTTP.HttpUtilEntity;
+import org.omenhelper.Utils.JsonUtil;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -79,21 +78,25 @@ public class Challenge {
     }
 
     // 获取进行中的任务
-    public List<String> currentList(){
+    public List<Map<String, Object>> currentList(){
         Map<String, Object> body = new CurrentChallengeListBody(applicationId, sessionToken).genBody();
-        List<String> currentList = new ArrayList<>();
+        List<Map<String, Object>> currentList = new ArrayList<>();
         HttpUtilEntity ret = request(body);
         if(ret == null) return null;
-        log.info("{}", ret);
+
         Map listMap = JsonUtil.string2Obj(ret.getBody(), Map.class);
         List<Map<String, Object>> collection = (List<Map<String, Object>>) (((Map) listMap.get("result")).get("collection"));
 
         collection.forEach(item -> {
             List<String> relevantEvents = (List<String>) item.get("relevantEvents");
             Map<String, Object> prize = (Map<String, Object>) (item.get("prize"));
+            int progressPercentage = (int)item.get("progressPercentage");
             String category = (String) prize.get("category");
             if ("sweepstake".equals(category)) {
-                currentList.add(relevantEvents.get(0));
+                currentList.add(new HashMap<String, Object>(){{
+                    put("eventName", relevantEvents.get(0));
+                    put("progress", progressPercentage);
+                }});
             }
         });
 
@@ -101,26 +104,27 @@ public class Challenge {
     }
 
     // 执行挑战
-    public boolean doIt(String eventName, int playTime) {
+    public Map<String, Object> doIt(String eventName, int playTime) {
         Map<String, Object> body = new ChallengePostBody(applicationId, sessionToken).genBody(eventName, playTime);
 
         // 发送请求
         log.info("开始发送请求");
         HttpUtilEntity ret = request(body);
-        if(ret == null)return false;
+        if(ret == null)return null;
         log.info("请求完毕");
 
         // 解析结果
         Map<String, Object> retMap = JsonUtil.string2Obj(ret.getBody(), Map.class);
         List<Map<String, Object>> result = (List<Map<String, Object>>) retMap.get("result");
 
-        result.forEach(o -> {
-            List<String> relevantEvents = (List<String>) o.get("relevantEvents");
-            int percentage = (int) o.get("progressPercentage");
+        Map<String, Object> item = result.get(0);
+        List<String> relevantEvents = (List<String>) item.get("relevantEvents");
+        int percentage = (int) item.get("progressPercentage");
 
-            log.info("事件：{} -- 已完成 {}%", relevantEvents, percentage);
-        });
-        return true;
+        log.info("事件：{} -- 已完成 {}%", relevantEvents, percentage);
+        return new HashMap<String, Object>(){{
+            put("progress", percentage);
+        }};
     }
 
     private HttpUtilEntity request(Map<String, Object> body) {

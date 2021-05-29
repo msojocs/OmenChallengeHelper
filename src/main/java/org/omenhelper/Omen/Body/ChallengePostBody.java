@@ -1,6 +1,6 @@
-package org.example.Omen.Body;
+package org.omenhelper.Omen.Body;
 
-import org.example.Omen.VsJSONProgressEvent;
+import org.omenhelper.Omen.VsJSONProgressEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
