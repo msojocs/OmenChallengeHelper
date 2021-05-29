@@ -1,5 +1,6 @@
 package org.omenhelper.Omen;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.http.ParseException;
 import org.omenhelper.Omen.Body.HandshakeBody;
 import org.omenhelper.Omen.Body.StartBody;
@@ -20,29 +21,40 @@ import java.util.Map;
  * @Date 2021/5/29 14:15
  * @Version 1.0
  **/
+@Slf4j
 public class Login {
-    private String email;
-    private String pass;
-    private String applicationId;
-    private String client_id;
+    private final String email;
+    private final String pass;
+    private final String applicationId = "6589915c-6aa7-4f1b-9ef5-32fa2220c844";
+    private final String client_id = "130d43f1-bb22-4a9c-ba48-d5743e84d113";
 
     HttpUtil2 httpUtil2 = new HttpUtil2();
     private String backendCsrf;
 
-    public Login(String email, String pass, String applicationId, String client_id) {
+    public Login(String email, String pass) {
         this.email = email;
         this.pass = pass;
-        this.applicationId = applicationId;
-        this.client_id = client_id;
     }
 
-    public void doWeb(){
+    public String doIt(){
 
+        log.info("登录准备");
         webPrepare();
+        log.info("开始模拟浏览器登录操作");
         String localhostUrl = webLogin();
+        log.info("开始模拟Omen登录操作");
         String tokenInfo = clientLogin(localhostUrl);
-        System.out.println(tokenInfo);
+        Map akMap = JsonUtil.string2Obj(tokenInfo, Map.class);
 
+        // 设备处理，按需
+        // Device device = new Device((String) akMap.get("access_token"));
+        // device.sendInfo();
+        // device.sendGetEmpty();
+        // device.getDetail();
+        // device.register();
+
+        log.info("开始获取挑战SESSION");
+        return genSession((String) akMap.get("access_token"));
     }
     private void webPrepare(){
         Map<String, Object> config = new HashMap<String, Object>(){{
@@ -56,7 +68,6 @@ public class Login {
         try {
             httpUtil2.updateConfig(config);
             HttpUtilEntity httpUtilEntity = httpUtil2.doGetEntity(url);
-            System.out.println(httpUtilEntity);
 
             String location = httpUtilEntity.getHeaders().get("location");
             Map<String, String> body = new HashMap<String, String>(){{
@@ -65,7 +76,6 @@ public class Login {
             HttpUtilEntity temp = httpUtil2.doStreamPost(backendUrl, JsonUtil.obj2String(body).getBytes(StandardCharsets.UTF_8), header);
             Map result = JsonUtil.string2Obj(temp.getBody(), Map.class);
             backendCsrf = (String) result.get("csrfToken");
-            System.out.println(temp);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -133,11 +143,12 @@ public class Login {
     private String genSession(String authorization){
         // https://www.hpgamestream.com/api/thirdParty/session/temporaryToken?applicationId=6589915c-6aa7-4f1b-9ef5-32fa2220c844
         Map<String, String> header = new HashMap<String, String>(){{
-            put("Authorization", authorization);
+            put("Authorization", "Bearer " + authorization);
         }};
         try {
             String url1 = "https://www.hpgamestream.com/api/thirdParty/session/temporaryToken?applicationId=" + applicationId;
             String tokenBody = httpUtil2.doGet2(url1, header);
+            log.debug(tokenBody);
             Map tokenMap = JsonUtil.string2Obj(tokenBody, Map.class);
             String token = (String) tokenMap.get("token");
 
@@ -153,7 +164,7 @@ public class Login {
             String[] split = authorization.split("\\.");
             String uinfo = new String(Base64.getDecoder().decode(split[1]));
             Map userMap = JsonUtil.string2Obj(uinfo, Map.class);
-            String startBody = new StartBody(applicationId, token).genBody((String)userMap.get("user_id"));
+            String startBody = new StartBody(applicationId, token).genBody((String)userMap.get("hpid_user_id"));
             HttpUtilEntity startResult = httpUtil2.doStreamPost("https://rpc-prod.versussystems.com/rpc", startBody.getBytes(StandardCharsets.UTF_8), new HashMap<String, String>() {{
                 put("Content-Type", "application/json;charset=utf-8");
             }});

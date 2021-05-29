@@ -2,6 +2,7 @@ package org.omenhelper;
 
 import lombok.extern.slf4j.Slf4j;
 import org.omenhelper.Omen.Challenge;
+import org.omenhelper.Omen.Login;
 
 import java.util.*;
 
@@ -16,11 +17,17 @@ public class App
     public static void main( String[] args ) throws Exception {
 
         Scanner scanner = new Scanner(System.in);
-        // 输入SESSION
         String sessionToken;
+
+        // System.out.print("请输入EMAIL：");
+        // String email = scanner.nextLine();
+        // System.out.print("请输入密码：");
+        // String pass = scanner.nextLine();
+        // Login login = new Login(email, pass);
+        // sessionToken = login.doIt();
+
         System.out.print("请输入SESSION：");
-        sessionToken = System.getenv("SESSION");
-        // sessionToken = scanner.nextLine();
+        sessionToken = scanner.nextLine();
 
         // 生成数据
         String applicationId = "6589915c-6aa7-4f1b-9ef5-32fa2220c844";

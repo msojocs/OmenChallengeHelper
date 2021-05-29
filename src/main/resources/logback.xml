@@ -185,7 +185,7 @@
     <logger name="cn.wecuit" level="WARN" />
 
     <!-- root级别 DEBUG -->
-    <root level="WARN">
+    <root level="DEBUG">
         <!-- 文件输出 -->
         <appender-ref ref="ERROR" />
         <appender-ref ref="INFO" />
