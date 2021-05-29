@@ -1,0 +1,11 @@
+{
+  "error": {
+    "code": 603,
+    "data": {
+      "detail": "Session is not valid"
+    },
+    "message": "Session is not valid"
+  },
+  "id": "6589915c-6aa7-4f1b-9ef5-32fa2220c844",
+  "jsonrpc": "2.0"
+}

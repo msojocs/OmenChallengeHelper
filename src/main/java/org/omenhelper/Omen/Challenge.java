@@ -137,7 +137,10 @@ public class Challenge {
             );
             int code = ret.getStatusCode();
             if(code == 400){
-                log.info("SESSION过期，请更新-响应码：{}, {}", ret.getStatusCode(), ret);
+                Map result = JsonUtil.string2Obj(ret.getBody(), Map.class);
+                Map<String, Object> error = (Map<String, Object>) result.get("error");
+                log.info("SESSION过期，请更新 - 响应码：{}, {}", ret.getStatusCode(), error.get("message"));
+                System.exit(-1);
                 return null;
             }else if (code != 200) {
                 log.info("响应异常-响应码：{}, {}", ret.getStatusCode(), ret);
