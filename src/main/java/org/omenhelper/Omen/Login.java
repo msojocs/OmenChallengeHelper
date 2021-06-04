@@ -1,5 +1,6 @@
 package org.omenhelper.Omen;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.http.ParseException;
 import org.omenhelper.Omen.Body.HandshakeBody;
@@ -11,10 +12,7 @@ import org.omenhelper.Utils.URLUtil;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Author jiyec
@@ -23,13 +21,19 @@ import java.util.Map;
  **/
 @Slf4j
 public class Login {
-    private final String email;
-    private final String pass;
+    @Setter
+    private String email;
+    @Setter
+    private String pass;
     private final String applicationId = "6589915c-6aa7-4f1b-9ef5-32fa2220c844";
     private final String client_id = "130d43f1-bb22-4a9c-ba48-d5743e84d113";
+    private String idpProvider = "hpid";
 
     HttpUtil2 httpUtil2 = new HttpUtil2();
     private String backendCsrf;
+
+    public Login() {
+    }
 
     public Login(String email, String pass) {
         this.email = email;
@@ -38,9 +42,6 @@ public class Login {
 
     public String doIt(){
 
-        log.info("登录准备");
-        webPrepare();
-        log.info("开始模拟浏览器登录操作");
         String localhostUrl = webLogin();
         log.info("开始模拟Omen登录操作");
         String tokenInfo = clientLogin(localhostUrl);
@@ -56,7 +57,7 @@ public class Login {
         log.info("开始获取挑战SESSION");
         return genSession((String) akMap.get("access_token"));
     }
-    private void webPrepare(){
+    public void webPrepare(){
         Map<String, Object> config = new HashMap<String, Object>(){{
             put("redirection", 1);
         }};
@@ -84,11 +85,41 @@ public class Login {
         }
     }
 
-    private String webLogin(){
+    public void idpProvider(){
+        String url = "https://ui-backend.us-west-2.id.hp.com/bff/v1/session/check-username";
+        Map<String, String> data = new HashMap<String, String>(){{
+            put("username", email);
+        }};
+        Map<String, String> header = new HashMap<String, String>(){{
+            put("Content-Type", "application/json;charset=utf-8");
+            put("csrf-token", backendCsrf);
+        }};
+        Map<String, Object> result = null;
+        try {
+            HttpUtilEntity httpUtilEntity = httpUtil2.doStreamPost(url, JsonUtil.obj2String(data).getBytes(StandardCharsets.UTF_8), header);
+            result = JsonUtil.string2Obj(httpUtilEntity.getBody(), Map.class);
+            if("captchaRequired".equals(result.get("error"))){
+                log.info("请求过于频繁，需要验证码！信息 -- {}", result);
+                log.info("请登录一次， https://myaccount.id.hp.com/uaa");
+                System.exit(-1);
+            }
+            List<Map<String, String>> identify = (List<Map<String, String>>) result.get("identities");
+            if(identify == null || identify.size() == 0){
+                log.info("检查账号出错！信息 -- {}", result);
+                System.exit(-1);
+            }
+            idpProvider = identify.get(0).get("idpProvider");
+            log.info("ID类型：{}, 地区：{}", idpProvider, identify.get(0).get("locale"));
+        }catch (IOException e){
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
+    public String webLogin(){
 
         String loginAddr = "https://ui-backend.us-west-2.id.hp.com/bff/v1/session/username-password";
         Map<String, String> data = new HashMap<String, String>(){{
-            put("username", email + "@hpid");
+            put("username", email + "@" + idpProvider);
             put("password", pass);
         }};
         Map<String, String> header = new HashMap<String, String>(){{
@@ -100,6 +131,7 @@ public class Login {
             Map<String, String> result = JsonUtil.string2Obj(httpUtilEntity.getBody(), Map.class);
             if(!"success".equals(result.get("status"))){
                 System.out.println("登录失败~");
+                log.info(httpUtilEntity.getBody());
                 System.exit(-1);
             }
             String nextUrl = result.get("nextUrl");
@@ -114,7 +146,7 @@ public class Login {
         return null;
     }
 
-    private String clientLogin(String localhostUrl){
+    public String clientLogin(String localhostUrl){
         Map<String, String> urlQuery = URLUtil.getURLQuery(localhostUrl);
         String oauthUrl = "https://oauth.hpbp.io/oauth/v1/token";
         Map<String, String> body = new LinkedHashMap<String, String>(){{
@@ -140,7 +172,7 @@ public class Login {
         return null;
     }
 
-    private String genSession(String authorization){
+    public String genSession(String authorization){
         // https://www.hpgamestream.com/api/thirdParty/session/temporaryToken?applicationId=6589915c-6aa7-4f1b-9ef5-32fa2220c844
         Map<String, String> header = new HashMap<String, String>(){{
             put("Authorization", "Bearer " + authorization);

@@ -3,6 +3,7 @@ package org.omenhelper;
 import lombok.extern.slf4j.Slf4j;
 import org.omenhelper.Omen.Challenge;
 import org.omenhelper.Omen.Login;
+import org.omenhelper.Utils.JsonUtil;
 
 import java.util.*;
 
@@ -18,13 +19,32 @@ public class App
 
         Scanner scanner = new Scanner(System.in);
         String sessionToken;
+        Login login = new Login();
+        log.info("登录准备");
+        login.webPrepare();
 
         System.out.print("请输入EMAIL：");
         String email = scanner.nextLine();
+        login.setEmail(email);
+        log.info("开始账号检查");
+        login.idpProvider();
         System.out.print("请输入密码：");
         String pass = scanner.nextLine();
-        Login login = new Login(email, pass);
-        sessionToken = login.doIt();
+        login.setPass(pass);
+        String localhostUrl = login.webLogin();
+        log.info("开始模拟Omen登录操作");
+        String tokenInfo = login.clientLogin(localhostUrl);
+        Map akMap = JsonUtil.string2Obj(tokenInfo, Map.class);
+
+        // 设备处理，按需
+        // Device device = new Device((String) akMap.get("access_token"));
+        // device.sendInfo();
+        // device.sendGetEmpty();
+        // device.getDetail();
+        // device.register();
+
+        log.info("开始获取挑战SESSION");
+        sessionToken = login.genSession((String) akMap.get("access_token"));
 
         // System.out.print("请输入SESSION：");
         // sessionToken = scanner.nextLine();
