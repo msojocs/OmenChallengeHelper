@@ -2,6 +2,7 @@ package org.omenhelper;
 
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.omenhelper.Omen.VsJSONProgressEvent;
 
@@ -49,13 +50,15 @@ public class AppTest
 
     }
 
-    // @Test
-    // public void signature() throws Exception {
-    //     System.out.println(new VsJSONProgressEvent(
-    //             "PLAY:LEAGUE_OF_LEGENDS",
-    //             "2021-05-27T04:10:07.769485Z",
-    //             "2021-05-27T04:10:10.430310Z",
-    //             1
-    //     ).GetSignature("6589915c-6aa7-4f1b-9ef5-32fa2220c844",""));
-    // }
+    @Test
+    public void testSignature() throws Exception {
+        // rDoHn3RAHsjk0aaRc7IrZ72XH/Q6pi6ojuBcXUnI3e8=
+        String sign = new VsJSONProgressEvent(
+                "Launch Game From GameLauncher",
+                "2021-06-08T02:35:45.086000Z",
+                "2021-06-08T03:24:45.087000Z",
+                1
+        ).GetSignature("6589915c-6aa7-4f1b-9ef5-32fa2220c844","49c21277-19a3-402a-9c65-5e37bbfc7e26");
+        Assert.assertEquals("rDoHn3RAHsjk0aaRc7IrZ72XH/Q6pi6ojuBcXUnI3e8=", sign);
+    }
 }

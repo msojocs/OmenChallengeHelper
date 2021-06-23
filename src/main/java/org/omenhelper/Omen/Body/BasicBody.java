@@ -1,9 +1,7 @@
 package org.omenhelper.Omen.Body;
 
-import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -27,6 +25,8 @@ public class BasicBody {
         put("jsonrpc", "2.0");
         put("params", params);
     }};
+
+    //===================================================================================
 
     public BasicBody(String applicationId, String sessionToken) {
         params.put("applicationId", applicationId);

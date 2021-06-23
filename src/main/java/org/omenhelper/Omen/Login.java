@@ -41,6 +41,7 @@ public class Login {
         this.pass = pass;
     }
 
+    @Deprecated
     public String doIt(){
 
         String localhostUrl = webLogin();
@@ -58,6 +59,7 @@ public class Login {
         log.info("开始获取挑战SESSION");
         return genSession((String) akMap.get("access_token"));
     }
+
     public void webPrepare(){
         Map<String, Object> config = new HashMap<String, Object>(){{
             put("redirection", 1);
